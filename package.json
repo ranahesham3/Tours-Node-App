@@ -3,22 +3,44 @@
     "version": "1.0.0",
     "description": "learning node, express and mangoDB",
     "main": "app.js",
+    "targets": {
+        "main": false
+    },
     "scripts": {
         "start": "nodemon server.js",
         "start:prod": "SET NODE_ENV=production&&nodemon server.js",
-        "debug": "ndb server.js"
+        "debug": "ndb server.js",
+        "build": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled",
+        "watch:js": "parcel serve ./public/js/index.js --dist-dir ./public/js/bundled"
     },
     "author": "Rana Hesham",
     "license": "ISC",
     "dependencies": {
+        "@babel/polyfill": "^7.12.1",
+        "bcryptjs": "^3.0.2",
+        "cookie-parser": "^1.4.7",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
+        "express-mongo-sanitize": "^2.2.0",
+        "express-rate-limit": "^7.5.0",
+        "helmet": "^8.1.0",
+        "hpp": "^0.2.3",
+        "html-to-text": "^9.0.5",
+        "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.12.2",
         "morgan": "^1.10.0",
+        "multer": "^2.0.1",
+        "nodemailer": "^6.10.1",
+        "nodemailer-brevo-transport": "^2.2.0",
+        "pug": "^3.0.3",
+        "sharp": "^0.34.2",
         "slugify": "^1.6.6",
-        "validator": "^13.15.0"
+        "stripe": "^7.0.0",
+        "validator": "^13.15.0",
+        "xss-clean": "^0.1.4"
     },
     "devDependencies": {
+        "buffer": "^6.0.3",
         "eslint": "^8.57.1",
         "eslint-config-airbnb": "^19.0.4",
         "eslint-config-prettier": "^10.1.1",
@@ -27,6 +49,8 @@
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-prettier": "^5.2.3",
         "eslint-plugin-react": "^7.37.4",
+        "parcel": "^2.15.2",
+        "parcel-bundler": "^1.12.5",
         "prettier": "^3.5.3"
     }
 }

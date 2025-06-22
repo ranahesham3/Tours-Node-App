@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+//const User = require('userModel');
 
 const tourSchema = mongoose.Schema(
     {
@@ -34,6 +35,7 @@ const tourSchema = mongoose.Schema(
             default: 4.5,
             min: [1, 'Rating must be above or equal 1.0'],
             max: [5, 'Rating must be below or equal 5.0'],
+            set: (val) => Math.round(val * 10) / 10,
         },
         ratingsQuantity: {
             type: Number,
@@ -73,12 +75,42 @@ const tourSchema = mongoose.Schema(
             default: Date.now(),
             select: false,
         },
-        startDates: [],
+        startDates: [Date],
         slug: String,
         secretTour: {
             type: Boolean,
             default: false,
         },
+        startLocation: {
+            type: {
+                type: String,
+                default: 'Point',
+                enum: ['Point'],
+            },
+            coordinates: [Number],
+            address: String,
+            description: String,
+        },
+        locations: [
+            {
+                type: {
+                    //This defines the GeoJSON type for geographic data
+                    type: String,
+                    default: 'Point',
+                    enum: ['Point'],
+                },
+                coordinates: [Number], // [longitude, latitude]
+                address: String,
+                description: String,
+                day: Number,
+            },
+        ],
+        guides: [
+            {
+                type: mongoose.Schema.ObjectId,
+                ref: 'User',
+            },
+        ],
     },
     {
         toJSON: { virtuals: true },
@@ -90,14 +122,37 @@ tourSchema.virtual('durationWeeks').get(function () {
     return this.duration / 7;
 });
 
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
+
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour',
+    localField: '_id',
+});
+
 // DOCUMENT MIDDLEWARE:runs before .save() &.create() but not before .insertMany()
 tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, { lower: true });
     next();
 });
-
+//Embedding the tour guide & this only work in creating not updating
+// tourSchema.pre('save', async function (next) {
+//     const tourGuides = this.guides.map(async (id) => await User.findById(id));
+//     this.guides = await Promise.all(tourGuides);
+//     next();
+// });
 //QUERY MIDDLEWARE
 // tourSchema.pre('find', function(next) {
+tourSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt',
+    });
+    next();
+});
+
 tourSchema.pre(/^find/, function (next) {
     this.find({ secretTour: { $ne: true } });
     this.start = Date.now();
@@ -110,10 +165,10 @@ tourSchema.post(/^find/, function (doc, next) {
 });
 
 //AGGREGATE MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-    next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//     this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//     next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
