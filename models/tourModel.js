@@ -159,10 +159,10 @@ tourSchema.pre(/^find/, function (next) {
     next();
 });
 
-tourSchema.post(/^find/, function (doc, next) {
-    console.log(`this query took ${Date.now() - this.start} millisecond`);
-    next();
-});
+// tourSchema.post(/^find/, function (doc, next) {
+//     console.log(`this query took ${Date.now() - this.start} millisecond`);
+//     next();
+// });
 
 //AGGREGATE MIDDLEWARE
 // tourSchema.pre('aggregate', function (next) {

@@ -112,7 +112,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
             },
         },
     });
-    console.log(`Tours in year: ${toursInYear.length}`);
+    // console.log(`Tours in year: ${toursInYear.length}`);
     const plan = await Tour.aggregate([
         {
             $unwind: '$startDates',
@@ -177,7 +177,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
         );
     }
 
-    console.log(distance, latlng, unit);
+    //console.log(distance, latlng, unit);
     const tours = await Tour.find({
         startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
     });

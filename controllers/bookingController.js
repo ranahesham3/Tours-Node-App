@@ -1,7 +1,8 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
+const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     //1)get the currently booked tour
@@ -14,7 +15,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
         //INFO about session itself
         payment_method_types: ['card'],
         //the url that 'll be called as soon as the purchease ia successful
-        success_url: `${req.protocol}://${req.get('host')}`,
+        success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourID}&user=${req.user.id}&price=${tour.price}`,
         //the url that 'll be called if the user cancels the payment
         cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
 
@@ -53,3 +54,19 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
         session,
     });
 });
+
+exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+    // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying
+    const { tour, user, price } = req.query; //is the object that contains  key-value pairs appended to a URL after a ? symbol
+
+    if (!tour && !user && !price) return next();
+    await Booking.create({ tour, user, price });
+
+    res.redirect(req.originalUrl.split('?')[0]);
+});
+
+exports.createBooking = factory.createOne(Booking);
+exports.getOneBooking = factory.getOne(Booking);
+exports.getAllBookings = factory.getAll(Booking);
+exports.deleteBookings = factory.deleteOne(Booking);
+exports.updateBooking = factory.updateOne(Booking);

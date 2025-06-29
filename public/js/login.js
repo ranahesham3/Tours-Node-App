@@ -1,5 +1,5 @@
 /* eslint-disable */
-// import axios from 'axios';
+import axios from 'axios';
 import { showAlert } from './alerts';
 
 export const login = async (email, password) => {
@@ -9,7 +9,7 @@ export const login = async (email, password) => {
         //send data using http request
         const res = await axios({
             method: 'POST',
-            url: 'http://127.0.0.1:3000/api/v1/users/logIn',
+            url: '/api/v1/users/logIn',
             data: {
                 email,
                 password,
@@ -25,6 +25,7 @@ export const login = async (email, password) => {
         }
     } catch (err) {
         //the same error message that will appeare if you use postman
+        //console.log(err);
         showAlert('error', err.response.data.message);
     }
 };
@@ -36,13 +37,12 @@ export const logout = async () => {
         //send data using http request
         const res = await axios({
             method: 'GET',
-            url: 'http://127.0.0.1:3000/api/v1/users/logOut',
+            url: '/api/v1/users/logOut',
         });
-
+        //console.log(res);
         if (res.data.status === 'success') location.reload();
         //to reload the same page you're standing in
     } catch (err) {
-        console.log(err.response);
         showAlert('error', 'Error logging out! Try again.');
     }
 };

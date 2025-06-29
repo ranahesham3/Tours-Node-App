@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -16,6 +17,7 @@ const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
+//Start express app
 const app = express();
 
 app.set('view engine', 'pug');
@@ -25,7 +27,42 @@ app.set('views', path.join(__dirname, 'views'));
 //serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 //set security http headers
-app.use(helmet());
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: [
+                "'self'",
+                'https://unpkg.com',
+                'https://tile.openstreetmap.org',
+                'ws://localhost:*',
+                'ws://127.0.0.1:*',
+            ],
+            scriptSrc: [
+                "'self'",
+                'https://unpkg.com/',
+                'https://tile.openstreetmap.org',
+                'https://js.stripe.com/v3/',
+            ],
+            styleSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                'https://unpkg.com/',
+                'https://tile.openstreetmap.org',
+                'https://fonts.googleapis.com/',
+            ],
+            workerSrc: ["'self'", 'blob:'],
+            objectSrc: [],
+            imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
+            fontSrc: ["'self'", 'fonts.googleapis.com', 'fonts.gstatic.com'],
+            frameSrc: [
+                "'self'",
+                'https://js.stripe.com', // Required for Stripe Elements
+                'https://hooks.stripe.com', // Required for webhooks
+            ],
+        },
+    }),
+);
 //development logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
@@ -58,6 +95,9 @@ app.use(
         ],
     }),
 );
+
+app.use(compression());
+
 //test middleware
 app.use((req, res, next) => {
     req.requesttime = new Date().toISOString();
