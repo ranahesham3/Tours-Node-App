@@ -7,6 +7,7 @@
         "main": false
     },
     "scripts": {
+        "dev": "node server.js",
         "start": "nodemon server.js",
         "start:prod": "SET NODE_ENV=production&&nodemon server.js",
         "debug": "ndb server.js",
@@ -59,5 +60,8 @@
         "stream-browserify": "^3.0.0",
         "stream-http": "^3.2.0",
         "util": "^0.12.5"
+    },
+    "engines": {
+        "node": ">=10.0.0"
     }
 }
