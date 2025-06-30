@@ -16,6 +16,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 
 //Start express app
@@ -90,6 +91,14 @@ const limiter = rateLimit({
     message: `Too many requests comming from this IP`,
 });
 app.use('/api', limiter);
+
+//we need the body in raw form (string and not json) and the next middleware will convert it to json so we need to but this before
+app.post(
+    '/webhook-checkout',
+    express.raw({ type: 'application/json' }),
+    bookingController.webhookCheckout,
+);
+
 //body parser,reading data from body into req.body
 app.use(express.json({ limit: '10kb' })); //the option is to limit the amount of data coming in PATCH or POST
 app.use(express.urlencoded({ extended: true, limit: '10kb' })); //to parse data coming from a form
