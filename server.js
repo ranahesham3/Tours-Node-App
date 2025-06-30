@@ -26,7 +26,18 @@ const server = app.listen(port, () => {
 
 process.on('unhandledRejection', (err) => {
     console.log(err.name, err.message);
+    //using .closs() to allow all the pending requests to still process until the end.
     server.close(() => {
         process.exit(1);
+    });
+});
+
+//Railway 'll sutdown our app erery 24H by sending this signal
+process.on('SIGTERM', () => {
+    console.log('SIGTERM RECIEVED, Shuting down gracefully');
+    //using .closs() to allow all the pending requests to still process until the end.
+    server.close(() => {
+        //we don't need to use exit manually because the SIGTERM itself 'll cause the server to shutdown
+        console.log('Process terminated!');
     });
 });

@@ -20,6 +20,9 @@ const viewRouter = require('./routes/viewRoutes');
 //Start express app
 const app = express();
 
+//prxy is a middleware from railway that modifies the req and change some states so the server need to trust it to accept the req
+app.enable('trust proxy');
+
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
