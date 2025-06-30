@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -27,6 +28,18 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // 1)GLOBAL MIDDLEWARES
+//implement cors
+app.use(cors()); //it 'll return a middleware that 'll add some headers
+//Access-Control-Allpow-Original * to allow every page to access our API
+/*      if we want to allow it to a specific page we can write it before the router or write the url here
+app.use(
+    cors({
+        origin: 'https://www.natours.com',
+    }),
+);*/
+
+app.options('*', cors()); //for non simple req(in preflight pjase)
+
 //serving static files
 app.use(express.static(path.join(__dirname, 'public')));
 //set security http headers
